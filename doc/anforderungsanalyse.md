@@ -3,7 +3,7 @@
 ---
 
 ## Ziel
-Planung und Controlling dienen dazu, den Aufwand je Aktivität zu planen, den effektiven Aufwand zu erfassen und Abweichungen (Delta) kurz zu begründen. Deltas sind normal und liefern Lernpunkte für zukünftige Arbeiten.
+Planung und Controlling dienen dazu, den Aufwand je Aktivität zu planen, den effektiven Aufwand zu erfassen und Abweichungen (Delta) kurz zu begründen. 
 
 ---
 
@@ -17,18 +17,18 @@ Planung und Controlling dienen dazu, den Aufwand je Aktivität zu planen, den ef
 
 ## Planung & Controlling 
 
-| Aktivität                             | Stunden geplant | Stunden geleistet | Delta | Erklärung |
-|---------------------------------------|----------------:|------------------:|------:|-----------|
-| Projektstruktur & Anforderungsanalyse |               2 |                   |       |           |
-| UML / Klassendiagramm                 |               5 |                   |       |           |
-| GUI-Konzept & Umsetzung               |               6 |                   |       |           |
-| Persistenz (Speichern/Laden)          |               4 |                   |       |           |
-| Implementierung Kernlogik (OOP)       |              10 |                   |       |           |
-| Tests planen                          |               5 |                   |       |           |
-| Tests durchführen / Bugfixing         |               7 |                   |       |           |
-| Dokumentation                         |              20 |                   |       |           |
-| Präsentation vorbereiten              |               4 |                   |       |           |
-| **Total**                             |          **63** |                   |       |           |
+| Aktivität                             | Stunden geplant |     Stunden geleistet | Delta | Erklärung |
+|---------------------------------------|----------------:|----------------------:|------:|-----------|
+| Projektstruktur & Anforderungsanalyse |               2 |                     2 |       |           |
+| UML / Klassendiagramm                 |               5 |                       |       |           |
+| GUI-Konzept & Umsetzung               |               6 |                       |       |           |
+| Persistenz (Speichern/Laden)          |               4 |                       |       |           |
+| Implementierung Kernlogik (OOP)       |              10 |                       |       |           |
+| Tests planen                          |               5 |                       |       |           |
+| Tests durchführen / Bugfixing         |               7 |                       |       |           |
+| Dokumentation                         |              20 |                       |       |           |
+| Präsentation vorbereiten              |               4 |                       |       |           |
+| **Total**                             |          **63** |                       |       |           |
 
 ---
 
