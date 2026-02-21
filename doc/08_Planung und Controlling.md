@@ -18,18 +18,18 @@ Planung und Controlling dienen dazu, den Aufwand je Aktivität zu planen, den ef
 
 ## Planung & Controlling 
 
-| Aktivität                             | Stunden geplant | Stunden geleistet | Delta | Erklärung                 |
-|---------------------------------------|----------------:|------------------:|------:|---------------------------|
-| Projektstruktur & Anforderungsanalyse |               2 |                 2 |       | Ging erstaunlich gut auf. |
-| UML / Klassendiagramm                 |               5 |                   |       |                           |
-| GUI-Konzept & Umsetzung               |               6 |                   |       |                           |
-| Persistenz (Speichern/Laden)          |               4 |                   |       |                           |
-| Implementierung Kernlogik (OOP)       |              10 |                   |       |                           |
-| Tests planen                          |               5 |                   |       |                           |
-| Tests durchführen / Bugfixing         |               7 |                   |       |                           |
-| Dokumentation                         |              20 |                 1 |       |                           |
-| Präsentation vorbereiten              |               4 |                   |       |                           |
-| **Total**                             |          **63** |                   |       |                           |
+| Aktivität                             | Stunden geplant |     Stunden geleistet | Delta | Erklärung                 |
+|---------------------------------------|----------------:|----------------------:|------:|---------------------------|
+| Projektstruktur & Anforderungsanalyse |               2 |                     2 |       | Ging erstaunlich gut auf. |
+| UML / Klassendiagramm                 |               5 |                       |       |                           |
+| GUI-Konzept & Umsetzung               |               6 |                       |       |                           |
+| Persistenz (Speichern/Laden)          |               4 |                       |       |                           |
+| Implementierung Kernlogik (OOP)       |              10 |                       |       |                           |
+| Tests planen                          |               5 |                       |       |                           |
+| Tests durchführen / Bugfixing         |               7 |                       |       |                           |
+| Dokumentation                         |              20 |                     3 |       |                           |
+| Präsentation vorbereiten              |               4 |                       |       |                           |
+| **Total**                             |          **63** |                       |       |                           |
 
 ---
 
