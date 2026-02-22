@@ -1,22 +1,24 @@
 
-# Planung und Controlling
+# 8 Planung und Controlling
+## 8.1 Ziel der Planung
+
+Ziel der Planung war es, den zeitlichen Aufwand der einzelnen Projektphasen realistisch einzuschätzen und im Verlauf der Umsetzung mit dem effektiv geleisteten Aufwand zu vergleichen.
+
+Die Analyse der Abweichungen dient der Reflexion und Verbesserung zukünftiger Arbeiten.
 
 ---
 
-## Ziel
-Planung und Controlling dienen dazu, den Aufwand je Aktivität zu planen, den effektiven Aufwand zu erfassen und Abweichungen (Delta) kurz zu begründen. 
+
 
 ---
 
-## Legende
+## 8.2 Planung und ist Vergleich 
+
+**Legende:** 
 - **Stunden geplant:** geplanter Aufwand
 - **Stunden geleistet:** effektiver Aufwand
 - **Delta:** geleistet − geplant
 - **Erklärung:** kurze Begründung der Abweichung
-
----
-
-## Planung & Controlling 
 
 | Aktivität                             | Stunden geplant | Stunden geleistet | Delta | Erklärung                 |
 |---------------------------------------|----------------:|------------------:|------:|---------------------------|
@@ -33,7 +35,7 @@ Planung und Controlling dienen dazu, den Aufwand je Aktivität zu planen, den ef
 
 ---
 
-## Kurze Delta-Analyse (Lessons Learned)
+## 8.3 Kurze Delta-Analyse (Lessons Learned)
 - **Was hat gut funktioniert?**  
   - 
 - **Wo gab es Mehraufwand und warum?**  
