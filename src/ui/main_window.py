@@ -1,100 +1,34 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional, List
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
-    QMainWindow, QPushButton, QSplitter, QTableWidget, QTableWidgetItem,
-    QTabWidget, QTextBrowser, QVBoxLayout, QWidget, QComboBox, QPlainTextEdit
+    QMainWindow, QMessageBox, QPushButton, QSplitter, QTableWidget,
+    QTableWidgetItem, QTabWidget, QTextBrowser, QVBoxLayout, QWidget,
+    QComboBox, QPlainTextEdit
 )
 
-
-# -------------------------
-# Fake data just for GUI preview
-# -------------------------
-@dataclass(slots=True)
-class FakeProject:
-    name: str
-    customer: str
-    leader: str
-    core: str
+from src.core.service import KnowledgeService
+from src.core.models import InfoType, CommentKind, Project, Information, Comment
+from src.ui.dialogs import ProjectDialog, InformationDialog, CommentDialog
 
 
-@dataclass(slots=True)
-class FakeInfo:
-    title: str
-    type_label: str
-    tags: str
-    created_by: str
-    date: str
-    detail_html: str
+def esc_html(s: str) -> str:
+    return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
 
 
-def demo_projects() -> List[FakeProject]:
-    return [
-        FakeProject("Intranet Relaunch", "Muster AG", "Max Muster", "Login, Rollen, Suche, CMS"),
-        FakeProject("Mobile App", "Beispiel GmbH", "Lisa Example", "Offline-Mode, Push, Analytics"),
-        FakeProject("ERP Schnittstelle", "Contoso", "Tom Test", "CSV Import, Validierung, Logs"),
-    ]
-
-
-def demo_infos_for(project_index: int) -> List[FakeInfo]:
-    if project_index == 0:
-        return [
-            FakeInfo(
-                "Kickoff-Protokoll", "Text", "Analyse, Anforderung",
-                "Max", "2026-02-02",
-                "<h2>Kickoff-Protokoll</h2>"
-                "<p><b>Original:</b> Scope, Stakeholder, Zeitplan …</p>"
-                "<hr><h3>Kommentare</h3>"
-                "<div style='padding:10px;border-radius:10px;background:#f5f5f5;'>"
-                "<b>Kommentar</b> — Lisa (2026-02-02)<br>Bitte SSO berücksichtigen."
-                "</div>"
-                "<div style='margin-top:10px;padding:10px;border-radius:10px;background:#e7f5ff;border-left:5px solid #0d6efd;'>"
-                "<b>Ergänzung</b> — Tom (2026-02-03)<br>SSO via Azure AD möglich."
-                "</div>"
-            ),
-            FakeInfo(
-                "Design-Entwurf", "Bild-URL", "Design",
-                "Lisa", "2026-02-05",
-                "<h2>Design-Entwurf</h2><p><b>Link:</b> https://example.com/mockup.png</p>"
-            ),
-        ]
-    if project_index == 1:
-        return [
-            FakeInfo(
-                "Anforderungen v1", "Text", "Anforderung",
-                "Lisa", "2026-01-12",
-                "<h2>Anforderungen v1</h2><p>Offline Mode, Push Notifications …</p>"
-                "<hr><h3>Korrekturen</h3>"
-                "<div style='padding:10px;border-radius:10px;background:#fff3cd;border-left:5px solid #ffc107;'>"
-                "<b>Korrektur</b> — Max (2026-01-13)<br>Push nur für Android in Phase 1."
-                "</div>"
-            ),
-        ]
-    return [
-        FakeInfo(
-            "Spezifikation", "Dok-URL", "Analyse, Design",
-            "Tom", "2026-01-20",
-            "<h2>Spezifikation</h2><p><b>Link:</b> https://example.com/spec.pdf</p>"
-        )
-    ]
-
-
-# -------------------------
-# Main Window (GUI only)
-# -------------------------
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, service: KnowledgeService):
         super().__init__()
-        self.setWindowTitle("Wissensmanagement – GUI Prototyp")
-        self.resize(1200, 750)
+        self.service = service
 
-        self._projects = demo_projects()
-        self._current_project_index: Optional[int] = None
-        self._current_infos: List[FakeInfo] = []
+        self.setWindowTitle("Wissensmanagement")
+        self.resize(1200, 760)
+
+        self.current_project_id: Optional[str] = None
+        self.current_information_id: Optional[str] = None
 
         root = QWidget()
         root_layout = QVBoxLayout(root)
@@ -102,12 +36,10 @@ class MainWindow(QMainWindow):
         root_layout.setSpacing(12)
         self.setCentralWidget(root)
 
-        # Split: sidebar + content
         splitter = QSplitter()
         splitter.setHandleWidth(8)
         root_layout.addWidget(splitter)
 
-        # Sidebar frame
         sidebar = QFrame()
         sidebar.setObjectName("Sidebar")
         sidebar_layout = QVBoxLayout(sidebar)
@@ -122,46 +54,43 @@ class MainWindow(QMainWindow):
         self.project_list.setSpacing(4)
         sidebar_layout.addWidget(self.project_list, 1)
 
-        btn_row = QHBoxLayout()
+        side_btn_row = QHBoxLayout()
         self.btn_new_project = QPushButton("Neues Projekt")
-        self.btn_edit_project = QPushButton("Bearbeiten")
-        btn_row.addWidget(self.btn_new_project)
-        btn_row.addWidget(self.btn_edit_project)
-        sidebar_layout.addLayout(btn_row)
+        side_btn_row.addWidget(self.btn_new_project)
+        sidebar_layout.addLayout(side_btn_row)
 
         splitter.addWidget(sidebar)
 
-        # Content frame
         content = QFrame()
         content.setObjectName("Content")
         content_layout = QVBoxLayout(content)
         content_layout.setContentsMargins(12, 12, 12, 12)
         content_layout.setSpacing(10)
 
-        # Tabs
         self.tabs = QTabWidget()
         content_layout.addWidget(self.tabs, 1)
 
-        # ----- Tab: Informationen -----
         tab_infos = QWidget()
         infos_layout = QVBoxLayout(tab_infos)
         infos_layout.setContentsMargins(0, 0, 0, 0)
         infos_layout.setSpacing(10)
 
-        # Tag filter row (loose tags)
         filter_row = QHBoxLayout()
         filter_row.setSpacing(10)
 
         filter_row.addWidget(QLabel("Tag 1"))
-        self.tag1 = QComboBox(); self.tag1.setEditable(True)
+        self.tag1 = QComboBox()
+        self.tag1.setEditable(True)
         filter_row.addWidget(self.tag1)
 
         filter_row.addWidget(QLabel("Tag 2"))
-        self.tag2 = QComboBox(); self.tag2.setEditable(True)
+        self.tag2 = QComboBox()
+        self.tag2.setEditable(True)
         filter_row.addWidget(self.tag2)
 
         filter_row.addWidget(QLabel("Tag 3"))
-        self.tag3 = QComboBox(); self.tag3.setEditable(True)
+        self.tag3 = QComboBox()
+        self.tag3.setEditable(True)
         filter_row.addWidget(self.tag3)
 
         self.btn_search = QPushButton("Suchen")
@@ -170,18 +99,16 @@ class MainWindow(QMainWindow):
         filter_row.addStretch(1)
         infos_layout.addLayout(filter_row)
 
-        # Action buttons
         action_row = QHBoxLayout()
-        self.btn_new_info = QPushButton("Neue Info")
+        self.btn_new_info = QPushButton("Neue Information")
         self.btn_add_comment = QPushButton("Kommentar hinzufügen")
         action_row.addWidget(self.btn_new_info)
         action_row.addWidget(self.btn_add_comment)
         action_row.addStretch(1)
         infos_layout.addLayout(action_row)
 
-        # Table + detail
         self.info_table = QTableWidget(0, 5)
-        self.info_table.setHorizontalHeaderLabels(["Titel", "Typ", "Tags", "Erstellt von", "Datum"])
+        self.info_table.setHorizontalHeaderLabels(["Titel", "Typ", "Tags", "Autor", "Datum"])
         self.info_table.setSelectionBehavior(QTableWidget.SelectRows)
         self.info_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.info_table.horizontalHeader().setStretchLastSection(True)
@@ -190,23 +117,20 @@ class MainWindow(QMainWindow):
         infos_layout.addWidget(QLabel("Detailansicht"))
         self.detail = QTextBrowser()
         self.detail.setOpenExternalLinks(True)
-        self.detail.setHtml("<i>Wähle links ein Projekt aus…</i>")
         infos_layout.addWidget(self.detail, 2)
 
         self.tabs.addTab(tab_infos, "Informationen")
 
-        # ----- Tab: Projekt-Details -----
         tab_details = QWidget()
         details_layout = QVBoxLayout(tab_details)
         details_layout.setContentsMargins(0, 0, 0, 0)
         details_layout.setSpacing(10)
 
-        self.lbl_p_name = QLabel("Projekt: –")
-        self.lbl_p_customer = QLabel("Kunde: –")
-        self.lbl_p_leader = QLabel("Projektleiter: –")
+        self.lbl_p_name = QLabel("Projekt: ")
+        self.lbl_p_customer = QLabel("Kunde: ")
+        self.lbl_p_leader = QLabel("Projektleiter: ")
         self.txt_core = QPlainTextEdit()
         self.txt_core.setReadOnly(True)
-        self.txt_core.setPlaceholderText("Kernanforderungen…")
 
         details_layout.addWidget(self.lbl_p_name)
         details_layout.addWidget(self.lbl_p_customer)
@@ -214,81 +138,221 @@ class MainWindow(QMainWindow):
         details_layout.addWidget(QLabel("Kernanforderungen"))
         details_layout.addWidget(self.txt_core, 1)
 
-        self.tabs.addTab(tab_details, "Projekt-Details")
+        self.tabs.addTab(tab_details, "Projekt Details")
 
         splitter.addWidget(content)
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 3)
 
-        # Wire signals (nur GUI-Demo)
-        self.project_list.currentItemChanged.connect(self._on_project_changed)
-        self.info_table.itemSelectionChanged.connect(self._on_info_selected)
+        self.btn_new_project.clicked.connect(self.on_new_project)
+        self.project_list.currentItemChanged.connect(self.on_project_changed)
+        self.btn_new_info.clicked.connect(self.on_new_information)
+        self.btn_add_comment.clicked.connect(self.on_add_comment)
+        self.btn_search.clicked.connect(self.on_search)
+        self.info_table.itemSelectionChanged.connect(self.on_information_selected)
 
-        # Buttons do nothing yet – only placeholders
-        self.btn_new_project.clicked.connect(lambda: self._toast("GUI only", "Projekt-Dialog kommt später (wenn Layout passt)."))
-        self.btn_edit_project.clicked.connect(lambda: self._toast("GUI only", "Bearbeiten kommt später."))
-        self.btn_new_info.clicked.connect(lambda: self._toast("GUI only", "Info-Dialog kommt später (wenn Layout passt)."))
-        self.btn_add_comment.clicked.connect(lambda: self._toast("GUI only", "Kommentar-Dialog kommt später."))
-        self.btn_search.clicked.connect(lambda: self._toast("GUI only", "Suche wird später angebunden."))
+        self.load_projects()
 
-        # Fill project list (demo)
-        self._populate_projects()
+    def error(self, msg: str) -> None:
+        QMessageBox.critical(self, "Fehler", msg)
 
-    def _toast(self, title: str, msg: str) -> None:
-        # bewusst simpel, damit UI nicht nervt
-        from PySide6.QtWidgets import QMessageBox
-        QMessageBox.information(self, title, msg)
+    def info(self, msg: str) -> None:
+        QMessageBox.information(self, "Info", msg)
 
-    def _populate_projects(self) -> None:
+    def load_projects(self) -> None:
+        self.project_list.blockSignals(True)
         self.project_list.clear()
-        for idx, p in enumerate(self._projects):
-            item = QListWidgetItem(f"{p.name} — {p.customer}")
-            item.setData(Qt.UserRole, idx)
+        projects = self.service.list_projects()
+        for p in projects:
+            item = QListWidgetItem(f"{p.name}  {p.customer}")
+            item.setData(Qt.UserRole, p.id)
             self.project_list.addItem(item)
+        self.project_list.blockSignals(False)
 
-        if self._projects:
+        if projects:
             self.project_list.setCurrentRow(0)
+        else:
+            self.current_project_id = None
+            self.current_information_id = None
+            self.info_table.setRowCount(0)
+            self.detail.setHtml("<i>Noch keine Projekte. Bitte ein Projekt anlegen.</i>")
 
-    def _on_project_changed(self, current: QListWidgetItem, previous: QListWidgetItem) -> None:
+    def on_new_project(self) -> None:
+        dlg = ProjectDialog(self)
+        from PySide6.QtWidgets import QDialog
+        if dlg.exec() != QDialog.Accepted:
+            return
+        name, customer, leader, core, employees = dlg.data()
+        try:
+            self.service.create_project(name, customer, leader, core, employees)
+            self.load_projects()
+        except Exception as e:
+            self.error(str(e))
+
+    def on_project_changed(self, current: QListWidgetItem, previous: QListWidgetItem) -> None:
         if not current:
             return
-        idx = current.data(Qt.UserRole)
-        self._current_project_index = int(idx)
+        self.current_project_id = current.data(Qt.UserRole)
+        self.current_information_id = None
+        self.refresh_project_details()
+        self.refresh_information_list()
 
-        p = self._projects[self._current_project_index]
+    def refresh_project_details(self) -> None:
+        if not self.current_project_id:
+            return
+        p = self.service.get_project(self.current_project_id)
+        if not p:
+            return
         self.lbl_p_name.setText(f"Projekt: {p.name}")
         self.lbl_p_customer.setText(f"Kunde: {p.customer}")
         self.lbl_p_leader.setText(f"Projektleiter: {p.leader}")
-        self.txt_core.setPlainText(p.core)
+        self.txt_core.setPlainText(p.core_requirements)
 
-        # load demo infos
-        self._current_infos = demo_infos_for(self._current_project_index)
-        self._populate_infos_table()
+    def refresh_information_list(self, infos: Optional[List[Information]] = None) -> None:
+        if not self.current_project_id:
+            return
+        if infos is None:
+            infos = self.service.list_informations(self.current_project_id)
 
-    def _populate_infos_table(self) -> None:
+        tmap = {
+            InfoType.TEXT: "Text",
+            InfoType.IMAGE_URL: "Bild URL",
+            InfoType.DOC_URL: "Dokument URL",
+        }
+
         self.info_table.setRowCount(0)
-        for info in self._current_infos:
+        for info in infos:
             r = self.info_table.rowCount()
             self.info_table.insertRow(r)
-            values = [info.title, info.type_label, info.tags, info.created_by, info.date]
+
+            tags_str = ", ".join(info.tags)
+            values = [info.title, tmap.get(info.type, info.type.value), tags_str, info.author, info.created_at]
             for c, v in enumerate(values):
                 it = QTableWidgetItem(v)
                 if c == 0:
-                    it.setData(Qt.UserRole, r)  # index in _current_infos
+                    it.setData(Qt.UserRole, info.id)
                 self.info_table.setItem(r, c, it)
 
         if self.info_table.rowCount() > 0:
             self.info_table.selectRow(0)
         else:
-            self.detail.setHtml("<i>Keine Infos (Demo).</i>")
+            self.detail.setHtml("<i>Keine Informationen gefunden.</i>")
 
-    def _on_info_selected(self) -> None:
+    def on_new_information(self) -> None:
+        if not self.current_project_id:
+            self.info("Bitte zuerst ein Projekt auswählen.")
+            return
+        dlg = InformationDialog(self)
+        from PySide6.QtWidgets import QDialog
+        if dlg.exec() != QDialog.Accepted:
+            return
+        info_type, title, content, tags, author = dlg.data()
+        try:
+            self.service.create_information(self.current_project_id, info_type, title, content, tags, author)
+            self.refresh_information_list()
+        except Exception as e:
+            self.error(str(e))
+
+    def on_add_comment(self) -> None:
+        if not self.current_information_id:
+            self.info("Bitte zuerst eine Information auswählen.")
+            return
+        dlg = CommentDialog(self)
+        from PySide6.QtWidgets import QDialog
+        from PySide6.QtWidgets import QDialog
+        if dlg.exec() != QDialog.Accepted:
+            return
+        kind, text, author = dlg.data()
+        try:
+            self.service.add_comment(self.current_information_id, kind, text, author)
+            self.render_detail()
+        except Exception as e:
+            self.error(str(e))
+
+    def on_search(self) -> None:
+        if not self.current_project_id:
+            return
+        tags = [self.tag1.currentText(), self.tag2.currentText(), self.tag3.currentText()]
+        try:
+            infos = self.service.search_informations_by_tags_loose(self.current_project_id, tags)
+            self.refresh_information_list(infos)
+        except Exception as e:
+            self.error(str(e))
+
+    def on_information_selected(self) -> None:
         row = self.info_table.currentRow()
         if row < 0:
             return
         first = self.info_table.item(row, 0)
         if not first:
             return
-        idx = int(first.data(Qt.UserRole))
-        info = self._current_infos[idx]
-        self.detail.setHtml(info.detail_html)
+        self.current_information_id = first.data(Qt.UserRole)
+        self.render_detail()
+
+    def render_detail(self) -> None:
+        if not self.current_information_id:
+            return
+        info = self.service.repo.get_information(self.current_information_id)
+        if not info:
+            return
+        comments = self.service.list_comments(self.current_information_id)
+
+        tmap = {
+            InfoType.TEXT: "Text",
+            InfoType.IMAGE_URL: "Bild URL",
+            InfoType.DOC_URL: "Dokument URL",
+        }
+
+        tags_str = ", ".join(info.tags)
+        html: List[str] = []
+        html.append(f"<h2 style='margin-bottom:4px;'>{esc_html(info.title)}</h2>")
+        html.append(
+            "<div style='color:#444;'>"
+            f"<b>Typ:</b> {esc_html(tmap.get(info.type, info.type.value))} "
+            f"<b>Tags:</b> {esc_html(tags_str)}<br>"
+            f"<b>Autor:</b> {esc_html(info.author)} "
+            f"<b>Datum:</b> {esc_html(info.created_at)}"
+            "</div><hr>"
+        )
+
+        if info.type == InfoType.TEXT:
+            html.append(
+                "<div style='padding:10px;border:1px solid #ddd;border-radius:10px;'>"
+                f"{esc_html(info.content)}"
+                "</div>"
+            )
+        else:
+            url = info.content.strip()
+            html.append(
+                "<div style='padding:10px;border:1px solid #ddd;border-radius:10px;'>"
+                f"<b>Link:</b> <a href='{esc_html(url)}'>{esc_html(url)}</a>"
+                "</div>"
+            )
+
+        html.append("<hr><h3>Kommentare, Ergänzungen, Korrekturen</h3>")
+
+        if not comments:
+            html.append("<i>Noch keine Kommentare.</i>")
+        else:
+            for c in comments:
+                label = {
+                    CommentKind.COMMENT: "Kommentar",
+                    CommentKind.ADDITION: "Ergänzung",
+                    CommentKind.CORRECTION: "Korrektur",
+                }[c.kind]
+
+                style = {
+                    CommentKind.COMMENT: "background:#f5f5f5;",
+                    CommentKind.ADDITION: "background:#e7f5ff;border-left:5px solid #2e90fa;",
+                    CommentKind.CORRECTION: "background:#fff3cd;border-left:5px solid #fdb022;",
+                }[c.kind]
+
+                html.append(
+                    f"<div style='margin:10px 0;padding:10px;border-radius:10px;{style}'>"
+                    f"<b>{label}</b>  {esc_html(c.author)} "
+                    f"<span style='color:#666;'>({esc_html(c.created_at)})</span><br>"
+                    f"{esc_html(c.text)}"
+                    "</div>"
+                )
+
+        self.detail.setHtml("\n".join(html))

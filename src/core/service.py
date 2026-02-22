@@ -12,7 +12,6 @@ from .validators import (
     validate_comment_fields,
 )
 
-
 class KnowledgeService:
     def __init__(self, repo: JsonRepository):
         self.repo = repo

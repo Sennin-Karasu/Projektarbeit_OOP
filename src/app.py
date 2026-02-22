@@ -1,49 +1,46 @@
-from __future__ import annotations
-
+import sys
 from pathlib import Path
+
+from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QPalette, QColor
 
 from src.core.repository import JsonRepository
 from src.core.service import KnowledgeService
-from src.core.models import InfoType, CommentKind
+from src.ui.main_window import MainWindow
+
+
+def apply_light_palette(app: QApplication) -> None:
+    app.setStyle("Fusion")
+    pal = QPalette()
+    pal.setColor(QPalette.Window, QColor("#f6f7f9"))
+    pal.setColor(QPalette.Base, QColor("#ffffff"))
+    pal.setColor(QPalette.AlternateBase, QColor("#f2f4f7"))
+    pal.setColor(QPalette.Text, QColor("#101828"))
+    pal.setColor(QPalette.WindowText, QColor("#101828"))
+    pal.setColor(QPalette.ButtonText, QColor("#101828"))
+    pal.setColor(QPalette.PlaceholderText, QColor("#667085"))
+    pal.setColor(QPalette.Button, QColor("#ffffff"))
+    pal.setColor(QPalette.Highlight, QColor("#2e90fa"))
+    pal.setColor(QPalette.HighlightedText, QColor("#ffffff"))
+    app.setPalette(pal)
 
 
 def main() -> None:
+    app = QApplication(sys.argv)
+    apply_light_palette(app)
+
+    qss_path = Path(__file__).parent / "ui" / "style.qss"
+    if qss_path.exists():
+        app.setStyleSheet(qss_path.read_text(encoding="utf-8"))
+
     data_path = Path(__file__).resolve().parents[1] / "data.json"
     repo = JsonRepository(data_path)
     service = KnowledgeService(repo)
 
-    if not service.list_projects():
-        p = service.create_project(
-            name="Demo Projekt",
-            customer="Xarelto",
-            leader="Projektleiter",
-            core_requirements="Kernanforderungen Demo",
-            employees=["Max", "Lisa"],
-        )
-        info = service.create_information(
-            project_id=p.id,
-            info_type=InfoType.TEXT,
-            title="Erste Information",
-            content="Das ist ein Demo Text.",
-            tags=["Analyse", "Anforderung"],
-            author="Max",
-        )
-        service.add_comment(
-            information_id=info.id,
-            kind=CommentKind.ADDITION,
-            text="Ergänzung zum Originaltext.",
-            author="Lisa",
-        )
+    w = MainWindow(service)
+    w.show()
 
-    projects = service.list_projects()
-    print(f"Projekte: {len(projects)}")
-    first = projects[0]
-    infos = service.list_informations(first.id)
-    print(f"Erstes Projekt: {first.name}")
-    print(f"Informationen: {len(infos)}")
-    if infos:
-        comments = service.list_comments(infos[0].id)
-        print(f"Kommentare zur ersten Information: {len(comments)}")
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
