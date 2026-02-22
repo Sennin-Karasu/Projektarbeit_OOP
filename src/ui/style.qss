@@ -1,0 +1,65 @@
+QMainWindow { background: #f6f7f9; }
+QWidget { font-size: 12px; }
+
+QLabel#SidebarTitle {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 4px;
+}
+
+QFrame#Sidebar {
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+}
+
+QFrame#Content {
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+}
+
+QPushButton {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+}
+QPushButton:hover { background: #f2f4f7; }
+QPushButton:pressed { background: #e4e7ec; }
+
+QLineEdit, QPlainTextEdit, QTextEdit, QComboBox {
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  padding: 7px 10px;
+  background: #ffffff;
+}
+
+QTabWidget::pane {
+  border: none;
+}
+
+QTabBar::tab {
+  padding: 9px 12px;
+  margin-right: 6px;
+  border-radius: 10px;
+  background: #eef2f6;
+  border: 1px solid #e4e7ec;
+}
+QTabBar::tab:selected {
+  background: #ffffff;
+}
+
+QListWidget, QTableWidget {
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+QHeaderView::section {
+  background: #f2f4f7;
+  padding: 7px;
+  border: none;
+  border-bottom: 1px solid #e4e7ec;
+  font-weight: 600;
+}
