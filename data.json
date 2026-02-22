@@ -11,7 +11,9 @@
         "Yves"
       ],
       "info_ids": [
-        "i-0ca66981f5"
+        "i-0ca66981f5",
+        "i-94d750a6fe",
+        "i-6662033a3c"
       ],
       "created_at": "2026-02-22T10:15:48"
     },
@@ -40,9 +42,65 @@
         "Undimensional"
       ],
       "author": "Manuel",
-      "comment_ids": [],
+      "comment_ids": [
+        "c-cfb58fe776",
+        "c-2419a84a2e"
+      ],
       "created_at": "2026-02-22T10:22:04"
+    },
+    "i-94d750a6fe": {
+      "id": "i-94d750a6fe",
+      "project_id": "p-42b7a1384a",
+      "type": "image_url",
+      "title": "Test Bild URL",
+      "content": "https://pixers.se/fototapeter/viking-man-32969628",
+      "tags": [
+        "6.0"
+      ],
+      "author": "El Mugel",
+      "comment_ids": [
+        "c-8c26f4ad2c"
+      ],
+      "created_at": "2026-02-22T10:27:54"
+    },
+    "i-6662033a3c": {
+      "id": "i-6662033a3c",
+      "project_id": "p-42b7a1384a",
+      "type": "text",
+      "title": "Xama",
+      "content": "Ningen",
+      "tags": [
+        "Gross"
+      ],
+      "author": "Madara",
+      "comment_ids": [],
+      "created_at": "2026-02-22T11:48:44"
     }
   },
-  "comments": {}
+  "comments": {
+    "c-8c26f4ad2c": {
+      "id": "c-8c26f4ad2c",
+      "information_id": "i-94d750a6fe",
+      "kind": "comment",
+      "text": "Mugel Test",
+      "author": "Yves",
+      "created_at": "2026-02-22T11:47:45"
+    },
+    "c-cfb58fe776": {
+      "id": "c-cfb58fe776",
+      "information_id": "i-0ca66981f5",
+      "kind": "correction",
+      "text": "Besser wenn so",
+      "author": "manuel",
+      "created_at": "2026-02-22T12:40:16"
+    },
+    "c-2419a84a2e": {
+      "id": "c-2419a84a2e",
+      "information_id": "i-0ca66981f5",
+      "kind": "comment",
+      "text": "oder so",
+      "author": "manuel",
+      "created_at": "2026-02-22T12:40:31"
+    }
+  }
 }

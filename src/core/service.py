@@ -36,14 +36,17 @@ class KnowledgeService:
         return self.repo.get_project(project_id)
 
     def create_information(
-        self,
-        project_id: str,
-        info_type: InfoType,
-        title: str,
-        content: str,
-        tags: List[str],
-        author: str,
+            self,
+            project_id: str,
+            info_type: InfoType,
+            title: str,
+            content: str,
+            tags: List[str],
+            author: str,
     ) -> Information:
+        if isinstance(info_type, str):
+            info_type = InfoType(info_type)
+
         tags_norm = normalize_tags(tags)
         validate_information_fields(info_type, title, content, author, tags_norm)
         info = Information.create(project_id, info_type, title, content, tags_norm, author)
@@ -54,12 +57,15 @@ class KnowledgeService:
         return self.repo.list_informations_for_project(project_id)
 
     def add_comment(
-        self,
-        information_id: str,
-        kind: CommentKind,
-        text: str,
-        author: str,
+            self,
+            information_id: str,
+            kind: CommentKind,
+            text: str,
+            author: str,
     ) -> Comment:
+        if isinstance(kind, str):
+            kind = CommentKind(kind)
+
         validate_comment_fields(kind, text, author)
         c = Comment.create(information_id, kind, text, author)
         self.repo.add_comment(c)

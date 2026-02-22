@@ -4,6 +4,7 @@ from typing import Optional, List
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QDialog,
     QFrame, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
     QMainWindow, QMessageBox, QPushButton, QSplitter, QTableWidget,
     QTableWidgetItem, QTabWidget, QTextBrowser, QVBoxLayout, QWidget,
@@ -11,7 +12,7 @@ from PySide6.QtWidgets import (
 )
 
 from src.core.service import KnowledgeService
-from src.core.models import InfoType, CommentKind, Project, Information, Comment
+from src.core.models import InfoType, CommentKind, Information
 from src.ui.dialogs import ProjectDialog, InformationDialog, CommentDialog
 
 
@@ -92,6 +93,10 @@ class MainWindow(QMainWindow):
         self.tag3 = QComboBox()
         self.tag3.setEditable(True)
         filter_row.addWidget(self.tag3)
+
+        for cb in (self.tag1, self.tag2, self.tag3):
+            cb.setMinimumWidth(180)
+            cb.setSizeAdjustPolicy(QComboBox.AdjustToContentsOnFirstShow)
 
         self.btn_search = QPushButton("Suchen")
         filter_row.addWidget(self.btn_search)
@@ -179,7 +184,6 @@ class MainWindow(QMainWindow):
 
     def on_new_project(self) -> None:
         dlg = ProjectDialog(self)
-        from PySide6.QtWidgets import QDialog
         if dlg.exec() != QDialog.Accepted:
             return
         name, customer, leader, core, employees = dlg.data()
@@ -196,6 +200,7 @@ class MainWindow(QMainWindow):
         self.current_information_id = None
         self.refresh_project_details()
         self.refresh_information_list()
+        self.refresh_tag_suggestions()
 
     def refresh_project_details(self) -> None:
         if not self.current_project_id:
@@ -207,6 +212,51 @@ class MainWindow(QMainWindow):
         self.lbl_p_customer.setText(f"Kunde: {p.customer}")
         self.lbl_p_leader.setText(f"Projektleiter: {p.leader}")
         self.txt_core.setPlainText(p.core_requirements)
+
+    def refresh_tag_suggestions(self) -> None:
+        if not self.current_project_id:
+            return
+
+        infos = self.service.list_informations(self.current_project_id)
+
+        tags_unique: List[str] = []
+        seen = set()
+        for info in infos:
+            for t in info.tags:
+                key = (t or "").strip().lower()
+                if key and key not in seen:
+                    seen.add(key)
+                    tags_unique.append(t.strip())
+
+        tags_unique.sort(key=lambda x: x.lower())
+
+        def keep_text(cb: QComboBox) -> str:
+            if cb.isEditable() and cb.lineEdit():
+                return cb.lineEdit().text().strip()
+            return cb.currentText().strip()
+
+        t1 = keep_text(self.tag1)
+        t2 = keep_text(self.tag2)
+        t3 = keep_text(self.tag3)
+
+        def refill(cb: QComboBox, text: str) -> None:
+            cb.blockSignals(True)
+            cb.clear()
+            cb.addItem("")
+            for t in tags_unique:
+                cb.addItem(t)
+            cb.blockSignals(False)
+
+            if text:
+                idx = cb.findText(text, Qt.MatchFixedString)
+                if idx >= 0:
+                    cb.setCurrentIndex(idx)
+                if cb.isEditable() and cb.lineEdit():
+                    cb.lineEdit().setText(text)
+
+        refill(self.tag1, t1)
+        refill(self.tag2, t2)
+        refill(self.tag3, t3)
 
     def refresh_information_list(self, infos: Optional[List[Information]] = None) -> None:
         if not self.current_project_id:
@@ -243,13 +293,13 @@ class MainWindow(QMainWindow):
             self.info("Bitte zuerst ein Projekt auswählen.")
             return
         dlg = InformationDialog(self)
-        from PySide6.QtWidgets import QDialog
         if dlg.exec() != QDialog.Accepted:
             return
         info_type, title, content, tags, author = dlg.data()
         try:
             self.service.create_information(self.current_project_id, info_type, title, content, tags, author)
             self.refresh_information_list()
+            self.refresh_tag_suggestions()
         except Exception as e:
             self.error(str(e))
 
@@ -258,8 +308,6 @@ class MainWindow(QMainWindow):
             self.info("Bitte zuerst eine Information auswählen.")
             return
         dlg = CommentDialog(self)
-        from PySide6.QtWidgets import QDialog
-        from PySide6.QtWidgets import QDialog
         if dlg.exec() != QDialog.Accepted:
             return
         kind, text, author = dlg.data()
@@ -272,10 +320,18 @@ class MainWindow(QMainWindow):
     def on_search(self) -> None:
         if not self.current_project_id:
             return
-        tags = [self.tag1.currentText(), self.tag2.currentText(), self.tag3.currentText()]
+
+        def read_tag(cb: QComboBox) -> str:
+            if cb.isEditable() and cb.lineEdit():
+                return cb.lineEdit().text().strip()
+            return cb.currentText().strip()
+
+        tags = [read_tag(self.tag1), read_tag(self.tag2), read_tag(self.tag3)]
+
         try:
             infos = self.service.search_informations_by_tags_loose(self.current_project_id, tags)
             self.refresh_information_list(infos)
+            self.refresh_tag_suggestions()
         except Exception as e:
             self.error(str(e))
 

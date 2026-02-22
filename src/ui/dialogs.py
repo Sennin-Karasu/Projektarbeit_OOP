@@ -37,15 +37,15 @@ class ProjectDialog(QDialog):
         layout.addWidget(buttons)
         self.setLayout(layout)
 
-    def data(self) -> Tuple[str, str, str, str, List[str]]:
-        employees_raw = self.employees_edit.text().strip()
-        employees = [x.strip() for x in employees_raw.split(",") if x.strip()] if employees_raw else []
+    def data(self):
+        kind = self.kind_combo.currentData()
+        if isinstance(kind, str):
+            kind = CommentKind(kind)
+
         return (
-            self.name_edit.text(),
-            self.customer_edit.text(),
-            self.leader_edit.text(),
-            self.core_edit.toPlainText(),
-            employees,
+            kind,
+            self.text_edit.toPlainText(),
+            self.author_edit.text(),
         )
 
 
@@ -128,9 +128,13 @@ class CommentDialog(QDialog):
         layout.addWidget(buttons)
         self.setLayout(layout)
 
-    def data(self) -> Tuple[CommentKind, str, str]:
+    def data(self):
+        kind = self.kind_combo.currentData()
+        if isinstance(kind, str):
+            kind = CommentKind(kind)
+
         return (
-            self.kind_combo.currentData(),
+            kind,
             self.text_edit.toPlainText(),
             self.author_edit.text(),
         )
