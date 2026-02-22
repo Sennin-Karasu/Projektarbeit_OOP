@@ -1,0 +1,47 @@
+{
+  "projects": {
+    "p-a5af8832c1": {
+      "id": "p-a5af8832c1",
+      "name": "Demo Projekt",
+      "customer": "Xarelto",
+      "leader": "Projektleiter",
+      "core_requirements": "Kernanforderungen Demo",
+      "employees": [
+        "Max",
+        "Lisa"
+      ],
+      "info_ids": [
+        "i-0c89d958a5"
+      ],
+      "created_at": "2026-02-22T09:56:51"
+    }
+  },
+  "informations": {
+    "i-0c89d958a5": {
+      "id": "i-0c89d958a5",
+      "project_id": "p-a5af8832c1",
+      "type": "text",
+      "title": "Erste Information",
+      "content": "Das ist ein Demo Text.",
+      "tags": [
+        "Analyse",
+        "Anforderung"
+      ],
+      "author": "Max",
+      "comment_ids": [
+        "c-442e3b755f"
+      ],
+      "created_at": "2026-02-22T09:56:51"
+    }
+  },
+  "comments": {
+    "c-442e3b755f": {
+      "id": "c-442e3b755f",
+      "information_id": "i-0c89d958a5",
+      "kind": "addition",
+      "text": "Ergänzung zum Originaltext.",
+      "author": "Lisa",
+      "created_at": "2026-02-22T09:56:51"
+    }
+  }
+}
