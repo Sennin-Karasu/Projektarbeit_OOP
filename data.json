@@ -13,7 +13,8 @@
       "info_ids": [
         "i-0ca66981f5",
         "i-94d750a6fe",
-        "i-6662033a3c"
+        "i-6662033a3c",
+        "i-96e6fe3eae"
       ],
       "created_at": "2026-02-22T10:15:48"
     },
@@ -75,6 +76,23 @@
       "author": "Madara",
       "comment_ids": [],
       "created_at": "2026-02-22T11:48:44"
+    },
+    "i-96e6fe3eae": {
+      "id": "i-96e6fe3eae",
+      "project_id": "p-42b7a1384a",
+      "type": "text",
+      "title": "Test von Yves",
+      "content": "Dies ist eine Testinfo erstellt von Yves",
+      "tags": [
+        "Test1",
+        "Test2",
+        "Test3"
+      ],
+      "author": "Yves Weber",
+      "comment_ids": [
+        "c-3aa2acaa88"
+      ],
+      "created_at": "2026-02-24T10:13:22"
     }
   },
   "comments": {
@@ -101,6 +119,14 @@
       "text": "oder so",
       "author": "manuel",
       "created_at": "2026-02-22T12:40:31"
+    },
+    "c-3aa2acaa88": {
+      "id": "c-3aa2acaa88",
+      "information_id": "i-96e6fe3eae",
+      "kind": "correction",
+      "text": "BlabliBuluBlaBla",
+      "author": "Yves",
+      "created_at": "2026-02-24T10:14:24"
     }
   }
 }

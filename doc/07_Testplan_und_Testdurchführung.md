@@ -27,20 +27,20 @@ Nebenfehler, Funktion grundsätzlich gegeben
 
 
 ## 7.2 Testmatrix
-| Anforderung                  | Testfall (was?)                                          | Kriterium (Bestehen)                                         | Ergebnis             | Einstufung |
-|------------------------------|----------------------------------------------------------|--------------------------------------------------------------|----------------------|-----------|
-|                              |                                                          |                                                              |       |  |
-| Projekt eröffnen             | Projekt mit allen Pflichtfeldern erstellen               | Projekt erscheint in Liste und bleibt nach Neustart erhalten |       |  |
-| Angaben Validieren           | Die im Projekt angegebnen Infos werden korrekt angezeigt | Alle Informationen stimmen mit eingegeben überein            |       |  |
-| Pflichtfelder validieren     | Projekt speichern ohne alle Angagben                     | Speichern wird verhindert und Fehelrmeldung                  |       |  |
-| Information Text             | Text Information mit 1-3 Tags anlegen                    | Information erscheint in Tabelle und Detailansicht           |                    |  |
-| Information Bild URL         | Bild URL speichern                                       | URL wird klickbar dargestellt                                |                   |  |
-| Information Dokument URL     | Dokument URL speichern                                   | URL wird korrekt angezeigt                                   |                   |  |
-| Maximal drei Tags            | Vier Tags eingeben                                       | Speichern wird verhindert                                    |            |  |
-| Kommentar hinzufügen         | Kommentar zu Information speichern                       | Kommentar erscheint unter Detailansicht                      |                      |
-| Kommentararten unterscheiden | Ergänzung und Korrektur speichern                        | Unterschiedliche Darstellung sichtbar                        |                      |
-| Tag Suche                    | Nach vorhandenem Tag suchen                              | Alle passenden Informationen erscheinen                      |                      |
-| Persistenz                   | Anwendung neu starten                                    | Alle Daten bleiben erhalten                                  |                      |
+| Anforderung                  | Testfall (was?)                                          | Kriterium (Bestehen)                                         | Ergebnis                        | Einstufung |
+|------------------------------|----------------------------------------------------------|--------------------------------------------------------------|---------------------------------|------------|
+|                              |                                                          |                                                              |                                 |            |
+| Projekt eröffnen             | Projekt mit allen Pflichtfeldern erstellen               | Projekt erscheint in Liste und bleibt nach Neustart erhalten | Kann kein neues Projekt starten | Critical   |
+| Angaben Validieren           | Die im Projekt angegebnen Infos werden korrekt angezeigt | Alle Informationen stimmen mit eingegeben überein            |                                 |            |
+| Pflichtfelder validieren     | Projekt speichern ohne alle Angagben                     | Speichern wird verhindert und Fehelrmeldung                  |                                 |            |
+| Information Text             | Text Information mit 1-3 Tags anlegen                    | Information erscheint in Tabelle und Detailansicht           |                                 |            |
+| Information Bild URL         | Bild URL speichern                                       | URL wird klickbar dargestellt                                |                                 |            |
+| Information Dokument URL     | Dokument URL speichern                                   | URL wird korrekt angezeigt                                   |                                 |            |
+| Maximal drei Tags            | Vier Tags eingeben                                       | Speichern wird verhindert                                    |                                 |            |
+| Kommentar hinzufügen         | Kommentar zu Information speichern                       | Kommentar erscheint unter Detailansicht                      |                                 |
+| Kommentararten unterscheiden | Ergänzung und Korrektur speichern                        | Unterschiedliche Darstellung sichtbar                        |                                 |
+| Tag Suche                    | Nach vorhandenem Tag suchen                              | Alle passenden Informationen erscheinen                      |                                 |
+| Persistenz                   | Anwendung neu starten                                    | Alle Daten bleiben erhalten                                  |                                 |
 
 
 # 7.3 Zusammenfassung der Testergebnisse

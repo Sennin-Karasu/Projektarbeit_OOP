@@ -9,9 +9,9 @@ Das Klassendiagramm bestand aus folgenden Klassen:
 
 - Projekt
 - Wissensablage
-- Projektmitarbeiter
-- Projektleiter (Spezialisierung)
-- Mitarbeiter (Spezialisierung)
+- Projektmitarbeiter (Vaterklasse)
+- Projektleiter (Vererbung)
+- Mitarbeiter (Vererbung)
 
 Der Fokus dieser Version lag darauf, die funktionalen Anforderungen in möglichst wenigen Klassen abzubilden und die Komplexität gering zu halten.
 
@@ -59,7 +59,7 @@ Dieses Vorgehen war bewusst gewählt, um:
 
 Projektmitarbeiter
 
-Die Klasse Projektmitarbeiter beschreibt Personen, welche in Projekten mitarbeiten und mit der Wissensablage interagieren.
+Die Klasse Projektmitarbeiter beschreibt Personen, welche in Projekten mitarbeiten und mit der Wissensablage interagieren. Sie dient als Vaterklasse für die Tochterklassen Projektleiter und Mitarbeiter.
 
 Attribute:
 - Name
@@ -74,7 +74,7 @@ Diese Klasse repräsentiert die Benutzerrollen im System. Eine detaillierte Benu
 
 Projektleiter
 
-Projektleiter ist eine Spezialisierung von Projektmitarbeiter.
+Projektleiter ist eine Tochterklasse von Projektmitarbeiter.
 
 Zusätzliche Methoden:
 - Projekt anlegen
@@ -85,7 +85,7 @@ Damit wird modelliert, dass der Projektleiter erweiterte Rechte besitzt.
 
 Mitarbeiter
 
-Mitarbeiter ist ebenfalls eine Spezialisierung von Projektmitarbeiter und verfügt über grundlegende Funktionen wie:
+Mitarbeiter ist ebenfalls eine Tochterklasse von Projektmitarbeiter und verfügt über grundlegende Funktionen wie:
 
 - Projekt beitreten
 
