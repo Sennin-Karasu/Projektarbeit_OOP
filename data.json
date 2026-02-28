@@ -27,7 +27,9 @@
       "employees": [
         "Perschä"
       ],
-      "info_ids": [],
+      "info_ids": [
+        "i-38782a4661"
+      ],
       "created_at": "2026-02-22T10:16:29"
     }
   },
@@ -93,6 +95,21 @@
         "c-3aa2acaa88"
       ],
       "created_at": "2026-02-24T10:13:22"
+    },
+    "i-38782a4661": {
+      "id": "i-38782a4661",
+      "project_id": "p-39f8b5a524",
+      "type": "text",
+      "title": "Muggel §",
+      "content": "Hoi",
+      "tags": [
+        "dolkjf",
+        "jfi",
+        "jj"
+      ],
+      "author": "Morna",
+      "comment_ids": [],
+      "created_at": "2026-02-28T18:15:35"
     }
   },
   "comments": {

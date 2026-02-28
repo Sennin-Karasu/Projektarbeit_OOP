@@ -8,10 +8,6 @@ Die Analyse der Abweichungen dient der Reflexion und Verbesserung zukünftiger A
 
 ---
 
-
-
----
-
 ## 8.2 Planung und ist Vergleich 
 
 **Legende:** 
