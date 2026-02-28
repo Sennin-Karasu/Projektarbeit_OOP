@@ -29,7 +29,7 @@ Die Analyse der Abweichungen dient der Reflexion und Verbesserung zukünftiger A
 | Implementierung Kernlogik (OOP)       |              10 |                 3 |       |                           |
 | Tests planen                          |               5 |                   |       |                           |
 | Tests durchführen / Bugfixing         |               7 |                   |       |                           |
-| Dokumentation                         |              20 |                 6 |       |                           |
+| Dokumentation                         |              20 |                10 |       |                           |
 | Präsentation vorbereiten              |               4 |                   |       |                           |
 | **Total**                             |          **63** |                   |       |                           |
 
