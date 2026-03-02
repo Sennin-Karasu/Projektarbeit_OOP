@@ -63,7 +63,7 @@ Die Oberfläche ermöglicht:
 - Durchführen der Tag Suche
 - Anzeige der Detailansicht mit klarer Unterscheidung zwischen Originaltext, Ergänzung und Korrektur
 
-Die Benutzeroberfläche greift ausschließlich über definierte Schnittstellen auf die Service Schicht zu.
+Die Benutzeroberfläche greift ausschliesslich über definierte Schnittstellen auf die Service Schicht zu.
 
 ## 5.6 Begründung des Lösungsansatzes
 

@@ -71,5 +71,5 @@ Folgende Funktionen sind nicht Bestandteil des Prototyps:
 - Benutzerverwaltung oder Rollenmodell
 - Mehrbenutzerbetrieb
 - Datei Upload Funktion
-- Optimierung für große Datenmengen
+- Optimierung für grosse Datenmengen
 - Netzwerkanbindung oder Cloud Speicherung
