@@ -87,3 +87,17 @@ class KnowledgeService:
             if itags.intersection(wanted):
                 result.append(info)
         return result
+
+    def delete_project(self, project_id: str) -> None:
+        project = self.repo.get_project(project_id)
+        if not project:
+            raise ValueError("Projekt nicht gefunden.")
+
+        infos = self.repo.list_informations_for_project(project_id)
+        for info in infos:
+            for c in self.repo.list_comments_for_information(info.id):
+                self.repo.remove_comment(c.id)
+            self.repo.remove_information(info.id)
+
+        self.repo.remove_project(project_id)
+        self.repo.save()

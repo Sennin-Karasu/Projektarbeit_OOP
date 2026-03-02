@@ -155,3 +155,34 @@ class JsonRepository:
                 out.append(Comment(**raw))
         out.sort(key=lambda x: x.created_at)
         return out
+
+    def remove_comment(self, comment_id: str) -> None:
+        raw = self._db["comments"].pop(comment_id, None)
+        if not raw:
+            return
+
+        info_id = raw.get("information_id")
+        info = self._db["informations"].get(info_id)
+        if info:
+            ids = info.get("comment_ids", [])
+            if comment_id in ids:
+                ids.remove(comment_id)
+
+    def remove_information(self, info_id: str) -> None:
+        raw = self._db["informations"].pop(info_id, None)
+        if not raw:
+            return
+
+        project_id = raw.get("project_id")
+        proj = self._db["projects"].get(project_id)
+        if proj:
+            ids = proj.get("info_ids", [])
+            if info_id in ids:
+                ids.remove(info_id)
+
+        # Safety: alle zugehörigen Kommentare ebenfalls entfernen
+        for cid in list(raw.get("comment_ids", [])):
+            self._db["comments"].pop(cid, None)
+
+    def remove_project(self, project_id: str) -> None:
+        self._db["projects"].pop(project_id, None)
