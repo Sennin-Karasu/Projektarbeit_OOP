@@ -38,48 +38,29 @@
       ],
       "created_at": "2026-02-22T10:16:29"
     },
-    "p-abe7ce8a5f": {
-      "id": "p-abe7ce8a5f",
-      "name": "Guggel",
-      "customer": "Muggel",
-      "leader": "Dubbel",
-      "core_requirements": "dsf",
+    "p-128bbe15d9": {
+      "id": "p-128bbe15d9",
+      "name": "Test Fall Projekt Anlegen",
+      "customer": "Kusi",
+      "leader": "Manuel",
+      "core_requirements": "5 Millionen",
       "employees": [
-        "sfd",
-        "Doton"
+        "Yves"
       ],
-      "info_ids": [],
-      "created_at": "2026-03-02T08:59:19"
+      "info_ids": [
+        "i-f7705c448e"
+      ],
+      "created_at": "2026-03-02T14:22:34"
     },
-    "p-b2c13c9893": {
-      "id": "p-b2c13c9893",
-      "name": "fgdhdsf",
-      "customer": "sdfg",
-      "leader": "sdfg",
-      "core_requirements": "sdfg",
+    "p-20a5da59d4": {
+      "id": "p-20a5da59d4",
+      "name": "Test Fall 1",
+      "customer": "Kusi",
+      "leader": "Manuel",
+      "core_requirements": "1 Milliarde $",
       "employees": [],
       "info_ids": [],
-      "created_at": "2026-03-02T09:38:32"
-    },
-    "p-0ef5f14ad3": {
-      "id": "p-0ef5f14ad3",
-      "name": "df",
-      "customer": "sadf",
-      "leader": "asfd",
-      "core_requirements": "asdf",
-      "employees": [],
-      "info_ids": [],
-      "created_at": "2026-03-02T09:43:19"
-    },
-    "p-f6ff42765c": {
-      "id": "p-f6ff42765c",
-      "name": "fdysg",
-      "customer": "fdt",
-      "leader": "cx",
-      "core_requirements": "gfc",
-      "employees": [],
-      "info_ids": [],
-      "created_at": "2026-03-02T10:19:55"
+      "created_at": "2026-03-02T14:26:23"
     }
   },
   "informations": {
@@ -231,6 +212,17 @@
       "author": "Yves",
       "comment_ids": [],
       "created_at": "2026-03-01T17:18:17"
+    },
+    "i-f7705c448e": {
+      "id": "i-f7705c448e",
+      "project_id": "p-128bbe15d9",
+      "type": "text",
+      "title": "Test Fall Information löschen",
+      "content": "Dieser Text soll nach dem Test gelöscht sein.",
+      "tags": [],
+      "author": "Yves",
+      "comment_ids": [],
+      "created_at": "2026-03-02T14:23:13"
     }
   },
   "comments": {
