@@ -8,11 +8,11 @@ from PySide6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
     QMainWindow, QMessageBox, QPushButton, QSplitter, QTableWidget,
     QTableWidgetItem, QTabWidget, QTextBrowser, QVBoxLayout, QWidget,
-    QComboBox, QPlainTextEdit
+    QComboBox, QPlainTextEdit, QInputDialog,
 )
 
-from src.core.service import KnowledgeService
 from src.core.models import InfoType, CommentKind, Information
+from src.core.service import KnowledgeService
 from src.ui.dialogs import ProjectDialog, InformationDialog, CommentDialog
 
 
@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
         splitter.setHandleWidth(8)
         root_layout.addWidget(splitter)
 
+        # Sidebar
         sidebar = QFrame()
         sidebar.setObjectName("Sidebar")
         sidebar_layout = QVBoxLayout(sidebar)
@@ -57,11 +58,14 @@ class MainWindow(QMainWindow):
 
         side_btn_row = QHBoxLayout()
         self.btn_new_project = QPushButton("Neues Projekt")
+        self.btn_delete_project = QPushButton("Projekt löschen")
         side_btn_row.addWidget(self.btn_new_project)
+        side_btn_row.addWidget(self.btn_delete_project)
         sidebar_layout.addLayout(side_btn_row)
 
         splitter.addWidget(sidebar)
 
+        # Content
         content = QFrame()
         content.setObjectName("Content")
         content_layout = QVBoxLayout(content)
@@ -71,6 +75,7 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         content_layout.addWidget(self.tabs, 1)
 
+        # Tab: Informationen
         tab_infos = QWidget()
         infos_layout = QVBoxLayout(tab_infos)
         infos_layout.setContentsMargins(0, 0, 0, 0)
@@ -100,8 +105,8 @@ class MainWindow(QMainWindow):
 
         self.btn_search = QPushButton("Suchen")
         filter_row.addWidget(self.btn_search)
-
         filter_row.addStretch(1)
+
         infos_layout.addLayout(filter_row)
 
         action_row = QHBoxLayout()
@@ -126,6 +131,7 @@ class MainWindow(QMainWindow):
 
         self.tabs.addTab(tab_infos, "Informationen")
 
+        # Tab: Projekt Details
         tab_details = QWidget()
         details_layout = QVBoxLayout(tab_details)
         details_layout.setContentsMargins(0, 0, 0, 0)
@@ -149,7 +155,10 @@ class MainWindow(QMainWindow):
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 3)
 
+        # Connects
         self.btn_new_project.clicked.connect(self.on_new_project)
+        self.btn_delete_project.clicked.connect(self.on_delete_project)
+
         self.project_list.currentItemChanged.connect(self.on_project_changed)
         self.btn_new_info.clicked.connect(self.on_new_information)
         self.btn_add_comment.clicked.connect(self.on_add_comment)
@@ -157,6 +166,10 @@ class MainWindow(QMainWindow):
         self.info_table.itemSelectionChanged.connect(self.on_information_selected)
 
         self.load_projects()
+        self._update_delete_button_state()
+
+    def _update_delete_button_state(self) -> None:
+        self.btn_delete_project.setEnabled(bool(self.current_project_id))
 
     def error(self, msg: str) -> None:
         QMessageBox.critical(self, "Fehler", msg)
@@ -164,14 +177,29 @@ class MainWindow(QMainWindow):
     def info(self, msg: str) -> None:
         QMessageBox.information(self, "Info", msg)
 
+    def _confirm_delete_step2(self) -> bool:
+        """
+        Zweite Bestätigung: User muss 'bestätigen' eintippen.
+        """
+        text, ok = QInputDialog.getText(
+            self,
+            "Bestätigung",
+            "Bitte 'bestätigen' eintippen, um das Löschen auszuführen:",
+        )
+        if not ok:
+            return False
+        return text.strip().lower() == "bestätigen"
+
     def load_projects(self) -> None:
         self.project_list.blockSignals(True)
         self.project_list.clear()
+
         projects = self.service.list_projects()
         for p in projects:
             item = QListWidgetItem(f"{p.name}  {p.customer}")
             item.setData(Qt.UserRole, p.id)
             self.project_list.addItem(item)
+
         self.project_list.blockSignals(False)
 
         if projects:
@@ -182,25 +210,35 @@ class MainWindow(QMainWindow):
             self.info_table.setRowCount(0)
             self.detail.setHtml("<i>Noch keine Projekte. Bitte ein Projekt anlegen.</i>")
 
+        self._update_delete_button_state()
+
     def on_new_project(self) -> None:
         dlg = ProjectDialog(self)
-        if dlg.exec() != QDialog.Accepted:
-            return
-        name, customer, leader, core, employees = dlg.data()
-        try:
-            self.service.create_project(name, customer, leader, core, employees)
-            self.load_projects()
-        except Exception as e:
-            self.error(str(e))
+        while True:
+            if dlg.exec() != QDialog.Accepted:
+                return
+
+            name, customer, leader, core, employees = dlg.data()
+            try:
+                self.service.create_project(name, customer, leader, core, employees)
+                self.load_projects()
+                return
+            except Exception as e:
+                self.error(str(e))
 
     def on_project_changed(self, current: QListWidgetItem, previous: QListWidgetItem) -> None:
         if not current:
+            self.current_project_id = None
+            self.current_information_id = None
+            self._update_delete_button_state()
             return
+
         self.current_project_id = current.data(Qt.UserRole)
         self.current_information_id = None
         self.refresh_project_details()
         self.refresh_information_list()
         self.refresh_tag_suggestions()
+        self._update_delete_button_state()
 
     def refresh_project_details(self) -> None:
         if not self.current_project_id:
@@ -292,30 +330,38 @@ class MainWindow(QMainWindow):
         if not self.current_project_id:
             self.info("Bitte zuerst ein Projekt auswählen.")
             return
+
         dlg = InformationDialog(self)
-        if dlg.exec() != QDialog.Accepted:
-            return
-        info_type, title, content, tags, author = dlg.data()
-        try:
-            self.service.create_information(self.current_project_id, info_type, title, content, tags, author)
-            self.refresh_information_list()
-            self.refresh_tag_suggestions()
-        except Exception as e:
-            self.error(str(e))
+        while True:
+            if dlg.exec() != QDialog.Accepted:
+                return
+
+            info_type, title, content, tags, author = dlg.data()
+            try:
+                self.service.create_information(self.current_project_id, info_type, title, content, tags, author)
+                self.refresh_information_list()
+                self.refresh_tag_suggestions()
+                return
+            except Exception as e:
+                self.error(str(e))
 
     def on_add_comment(self) -> None:
         if not self.current_information_id:
             self.info("Bitte zuerst eine Information auswählen.")
             return
+
         dlg = CommentDialog(self)
-        if dlg.exec() != QDialog.Accepted:
-            return
-        kind, text, author = dlg.data()
-        try:
-            self.service.add_comment(self.current_information_id, kind, text, author)
-            self.render_detail()
-        except Exception as e:
-            self.error(str(e))
+        while True:
+            if dlg.exec() != QDialog.Accepted:
+                return
+
+            kind, text, author = dlg.data()
+            try:
+                self.service.add_comment(self.current_information_id, kind, text, author)
+                self.render_detail()
+                return
+            except Exception as e:
+                self.error(str(e))
 
     def on_search(self) -> None:
         if not self.current_project_id:
@@ -412,3 +458,37 @@ class MainWindow(QMainWindow):
                 )
 
         self.detail.setHtml("\n".join(html))
+
+    def on_delete_project(self) -> None:
+        if not self.current_project_id:
+            self.info("Bitte zuerst ein Projekt auswählen.")
+            return
+
+        project = self.service.get_project(self.current_project_id)
+        if not project:
+            self.error("Projekt nicht gefunden.")
+            return
+
+        r = QMessageBox.question(
+            self,
+            "Projekt löschen",
+            f"Willst du das Projekt '{project.name}' wirklich löschen?\n"
+            "Alle Informationen und Kommentare werden ebenfalls gelöscht.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if r != QMessageBox.Yes:
+            return
+
+        if not self._confirm_delete_step2():
+            self.info("Bestätigung fehlgeschlagen. Löschen abgebrochen.")
+            return
+
+        try:
+            self.service.delete_project(self.current_project_id)
+            self.current_project_id = None
+            self.current_information_id = None
+            self.load_projects()
+            self.detail.setHtml("<i>Projekt gelöscht.</i>")
+        except Exception as e:
+            self.error(str(e))

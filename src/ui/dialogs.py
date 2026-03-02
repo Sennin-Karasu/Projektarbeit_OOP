@@ -3,8 +3,13 @@ from __future__ import annotations
 from typing import List, Tuple
 
 from PySide6.QtWidgets import (
-    QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QPlainTextEdit,
-    QVBoxLayout, QComboBox
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLineEdit,
+    QPlainTextEdit,
+    QVBoxLayout,
+    QComboBox,
 )
 
 from src.core.models import InfoType, CommentKind
@@ -20,13 +25,14 @@ class ProjectDialog(QDialog):
         self.leader_edit = QLineEdit()
         self.core_edit = QPlainTextEdit()
         self.employees_edit = QLineEdit()
+        self.employees_edit.setPlaceholderText("Namen mit Komma trennen, z.B. Max, Lisa")
 
         form = QFormLayout()
         form.addRow("Projektname", self.name_edit)
         form.addRow("Kunde", self.customer_edit)
         form.addRow("Projektleiter", self.leader_edit)
         form.addRow("Kernanforderungen", self.core_edit)
-        form.addRow("Mitarbeitende Namen", self.employees_edit)
+        form.addRow("Mitarbeitende", self.employees_edit)
 
         buttons = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
         buttons.accepted.connect(self.accept)
@@ -37,15 +43,15 @@ class ProjectDialog(QDialog):
         layout.addWidget(buttons)
         self.setLayout(layout)
 
-    def data(self):
-        kind = self.kind_combo.currentData()
-        if isinstance(kind, str):
-            kind = CommentKind(kind)
-
+    def data(self) -> Tuple[str, str, str, str, List[str]]:
+        employees_raw = self.employees_edit.text().strip()
+        employees = [x.strip() for x in employees_raw.split(",") if x.strip()] if employees_raw else []
         return (
-            kind,
-            self.text_edit.toPlainText(),
-            self.author_edit.text(),
+            self.name_edit.text(),
+            self.customer_edit.text(),
+            self.leader_edit.text(),
+            self.core_edit.toPlainText(),
+            employees,
         )
 
 
@@ -85,9 +91,8 @@ class InformationDialog(QDialog):
         layout.addWidget(buttons)
         self.setLayout(layout)
 
-    def data(self):
+    def data(self) -> Tuple[InfoType, str, str, List[str], str]:
         info_type = self.type_combo.currentData()
-        # Absicherung falls currentData als str zurückkommt
         if isinstance(info_type, str):
             info_type = InfoType(info_type)
 
@@ -104,11 +109,11 @@ class InformationDialog(QDialog):
 class CommentDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Kommentar hinzufügen")
+        self.setWindowTitle("Kommentar hinzufuegen")
 
         self.kind_combo = QComboBox()
         self.kind_combo.addItem("Kommentar", CommentKind.COMMENT)
-        self.kind_combo.addItem("Ergänzung", CommentKind.ADDITION)
+        self.kind_combo.addItem("Ergaenzung", CommentKind.ADDITION)
         self.kind_combo.addItem("Korrektur", CommentKind.CORRECTION)
 
         self.author_edit = QLineEdit()
@@ -128,7 +133,7 @@ class CommentDialog(QDialog):
         layout.addWidget(buttons)
         self.setLayout(layout)
 
-    def data(self):
+    def data(self) -> Tuple[CommentKind, str, str]:
         kind = self.kind_combo.currentData()
         if isinstance(kind, str):
             kind = CommentKind(kind)
@@ -138,3 +143,4 @@ class CommentDialog(QDialog):
             self.text_edit.toPlainText(),
             self.author_edit.text(),
         )
+
